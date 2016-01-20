@@ -9,9 +9,11 @@ import access = require("../database/IDataAccessor");
 import log = require("../../utils/Log");
 
 export class Device implements idev.IDevice {
+    private static TAG = "Device";
 
     private active: boolean;
     private param: Object;
+    private udid: string;
     private refTerminal: iterm.ITerminal;
     private emitter: event.EventEmitter;
     private isBusy: boolean;            //如果PushTask正在执行就设为true，否则设为false
@@ -23,11 +25,13 @@ export class Device implements idev.IDevice {
         this.active = false;
         this.refTerminal = terminal;
         this.emitter = new event.EventEmitter();
+        this.udid = this.GetDeviceParameter("udid");
+        log.info( Device.TAG, "got device: udid=%s", this.udid );
     }
 
     // 设备唯一编号
     GetDeviceUniqueID(): string {
-        return this.param["udid"];
+        return this.udid;
     }
 
     GetTerminal(): iterm.ITerminal {
@@ -55,9 +59,11 @@ export class Device implements idev.IDevice {
 
     Destroy(): void {
         if (this.active) {
-            // 1 清理事件监听
+            // 取消推送监听
+            access.Instance().SetPushProcessor(this, null);
+            // 清理事件监听
             this.emitter.removeAllListeners();
-            // 2 关闭频道订阅
+            // 关闭频道订阅
             this.emitter = null;
             this.refTerminal = null;
             this.param = null;

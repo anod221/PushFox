@@ -69,8 +69,7 @@ export class ReqReader {
         }
         else {
             // 拼接原来包
-            this.buffer.position = this.buffer.length;
-            this.buffer.writeBytes(buf);
+            buf.readBytes(this.buffer, this.buffer.length, buf.bytesAvailable);
             this.buffer.position = 0;
             
             // 清理现场
@@ -81,8 +80,10 @@ export class ReqReader {
     }
 
     private CutPackage(buffer: io.ByteArray): void {
-        var buf = new io.ByteArray(buffer.bytesAvailable);
-        buffer.readBytes(buf);
-        this.buffer = buf;
+        if (buffer.bytesAvailable > 0) {
+            var buf = new io.ByteArray(buffer.bytesAvailable);
+            buffer.readBytes(buf);
+            this.buffer = buf;
+        }
     }
 }

@@ -10,6 +10,7 @@ import optor = require("./base/SocketOperator");
 import device = require("../solution/controller/interf/IDevice");
 import handshakepto = require("./proto/handshake/ProtoHandshake");
 import byepto = require("./proto/error/ProtoBye");
+import pushpto = require("./proto/push/ProtoPush");
 import DeviceMgr = require("../solution/manager/DeviceMgr");
 
 export class Terminal implements iterm.ITerminal {
@@ -70,7 +71,7 @@ export class Terminal implements iterm.ITerminal {
     }
 
     Push(msgs: Array<string>) {
-        // TODO
+        this.messager.Send(new pushpto.ProtoPush(msgs), this.commReqIndex);
         this.commReqIndex = 0;
     }
 

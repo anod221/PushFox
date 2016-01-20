@@ -13,20 +13,24 @@ import tget = require("../../database/redistask/GetTask");
  */
 export class PushTask extends task.Task {
 
-    public msgs: Array<string>;
+    private refSMemberTask: any;
     private dev: device.IDevice;
 
     constructor(client: any, source:any, dev: device.IDevice) {
         super(client);
-        this.msgs = new Array<string>();
+        this.refSMemberTask = source;
         this.dev = dev;
-        for (var i = 0; i < source.length; ++i) {
-            this.msgs[i] = source[i].result;
-        }
     }
 
     Execute() {
         super.Execute();
+        var msgs: Array<string> = this.refSMemberTask.result;
+        if (msgs.length == 0) {
+            this.Done();
+            return;
+        }
+
+
         var tasks = new taskq.TaskQueue();
         var self = this;
         var client = this.data;
@@ -34,21 +38,22 @@ export class PushTask extends task.Task {
 
         var selecttask = new tsel.SelectDBTask(client, tsel.SelectDBTask.DB_MESSAGE_MAP);
         tasks.AddTask(selecttask);
-        for (var i = 0; i < this.msgs.length; ++i) {
-            var gettask = new tget.GetTask(client, this.msgs[i]);
+        for (var i = 0; i < msgs.length; ++i) {
+            var gettask = new tget.GetTask(client, msgs[i]);
             tasks.AddTask(gettask);
             messages.push(gettask);
         }
         tasks.once("complete", function () {
             var m: Array<string> = new Array<string>();
             for (var i = 0; i < messages.length; ++i) {
-                m.push(messages[i].data+"&index="+messages[i].queryKey);
+                m.push(messages[i].result+"&index="+messages[i].queryKey);
             }
             self.Push( m );
         });
         tasks.once("abort", function () {
             self.Done();
         });
+        tasks.Execute();
     }
 
     Push(msgs: Array<string>) {

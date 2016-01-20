@@ -9,12 +9,18 @@ import task = require("../tasking/Task");
 import taskq = require("../tasking/TaskQueue");
 
 import tsel = require("./redistask/SelectDBTask");
-import tsmem = require("./redistask/SMemberTask");
+import tsmem = require("./redistask/SMembersTask");
+import tsub = require("./redistask/SubscribeTask");
 import tpush = require("../controller/task/PushTask");
 import tclrmsg = require("../controller/task/ClearMsgTask");
+import log = require("../../utils/Log");
 
 export class RedisAccess implements base.IDataAccess {
-    public client: any;                 //redisClient
+
+    private static TAG = "RedisAccess";
+
+    private client: any;                 //redisClient
+    private channel: any;                //redisClient for subscribe
 
     constructor() {
         this.client = redis.createClient({
@@ -23,7 +29,15 @@ export class RedisAccess implements base.IDataAccess {
         });
 
         this.client.on("error", function (err) {
-            console.error("redis error:%s", err);
+            log.error(RedisAccess.TAG, "redis error:%s", err);
+        });
+
+        this.channel = redis.createClient({
+            host: "localhost",
+            port: 6379
+        });
+        this.channel.on("error", function (err) {
+            log.error(RedisAccess.TAG, "redis chat error:%s", err);
         });
     }
 
@@ -35,31 +49,26 @@ export class RedisAccess implements base.IDataAccess {
         var selecttask = new tsel.SelectDBTask(this.client, tsel.SelectDBTask.DB_PENDING_MAP);
         tasks.AddTask(selecttask);
         // 第二步：读取pending message的数据
-        var readtask = new tsmem.SMemberTask(this.client, dev.GetDeviceUniqueID());
+        var readtask = new tsmem.SMembersTask(this.client, dev.GetDeviceUniqueID());
         tasks.AddTask(readtask);
         // 第三步：发送协议
         var sendtask = new tpush.PushTask(this.client, readtask, dev);
-        tasks.AddTask(readtask);
+        tasks.AddTask(sendtask);
 
         processor( tasks );
     }
 
     SetPushProcessor(dev: device.IDevice, processor: Function): void {
         assert(dev != null, "无法订阅空设备信息");
-        if (process) {
+        if (processor) {
             // 添加监听
-            this.client.subscribe(dev.GetDeviceUniqueID(), function (error, message) {
-                if (!error) {
-                    processor(message);
-                }
-                else {
-                    console.error(error);
-                }
-            });
+            var self = this;
+            var subscb = new tsub.SubscribeTask(this.channel, dev.GetDeviceUniqueID(), processor);
+            subscb.Execute();
         }
         else {
             // 移除监听
-            this.client.unsubscribe(dev.GetDeviceUniqueID());
+            this.channel.unsubscribe(dev.GetDeviceUniqueID());
         }
     }
 

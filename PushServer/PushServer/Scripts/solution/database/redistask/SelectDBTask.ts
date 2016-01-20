@@ -18,7 +18,7 @@ export class SelectDBTask extends task.Task {
     Execute() {
         super.Execute();
         var self = this;
-        this.data.selectASync(this.dbindex, function (error) {
+        this.data.select(this.dbindex, function (error) {
             if (error) {
                 log.error("SelectDBTask", "redis select error:%s", error);
                 self.Abort();

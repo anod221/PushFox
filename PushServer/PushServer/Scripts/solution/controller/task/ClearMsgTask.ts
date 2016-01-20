@@ -35,8 +35,7 @@ export class ClearMsgTask extends task.Task {
             .srem(targets)
             .select(tsel.SelectDBTask.DB_MESSAGE_MAP)
             .del(this.msgids)
-            .execAsync()
-            .then(function () {
+            .exec(function () {
                 self.Done();
             });
     }

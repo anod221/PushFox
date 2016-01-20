@@ -34,6 +34,10 @@ export class TaskQueue extends task.Task{
         return retval;
     }
 
+    CurrentTask(): task.Task {
+        return this.queue[this.cursor];
+    }
+
     Execute() {
         super.Execute();
         if (this.cursor < this.length) {

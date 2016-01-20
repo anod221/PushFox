@@ -1,10 +1,10 @@
 ﻿import task = require("../../tasking/Task");
 import log = require("../../../utils/Log");
 
-export class GetTask extends task.Task {
+export class SMembersTask extends task.Task {
 
     public queryKey: string;
-    public result: any;
+    public result: Array<string>;
 
     constructor(client: any, key: string) {
         super(client);
@@ -14,14 +14,14 @@ export class GetTask extends task.Task {
     Execute() {
         super.Execute();
         var self = this;
-        this.data.get(this.queryKey, function (error, result) {
+        this.data.smembers(this.queryKey, function (error, result) {
             if (error == null) {
                 self.result = result;
-                log.debug("GetTask", "redis get[%s]=%s", self.queryKey, result);
+                log.debug("SMembersTask", "redis smember: key=%s, result=%s", self.queryKey, result);
                 self.Done();
             }
             else {
-                log.error("GetTask", "redis get error:%s", error);
+                log.error("SMembersTask", "redis smember error:%s", error);
                 self.Abort();
             }
         });

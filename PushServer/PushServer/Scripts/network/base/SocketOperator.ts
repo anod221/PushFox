@@ -70,7 +70,7 @@ export class SocketOpeartor {
             catch (error) {
                 // 协议有问题
                 this.refTerminal.Disconnect();
-                log.error(SocketOpeartor.TAG, "get data error:%s", error);
+                log.error(SocketOpeartor.TAG, "process data error:%s", error, error.message, error.stack);
                 log.fatal(SocketOpeartor.TAG, "invalid network data: ip=%s", this.refConnection.remoteAddress);
                 break;
             }

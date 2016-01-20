@@ -29,7 +29,7 @@ function getTime(): string{
 export function debug(tag: string, format: string, ...args): void {
     var temp = args.slice();
     temp.unshift(getTime() + "[DEBUG]<" + tag + "> " + format);
-    console.debug.apply(console, temp);
+    console.info.apply(console, temp);
     var filelogger = getLogger(tag);
     filelogger.log.apply(filelogger, temp);
 }
@@ -54,6 +54,7 @@ export function error(tag: string, format: string, ...args): void {
     var temp = args.slice();
     temp.unshift(getTime() + "[ERROR]<" + tag + "> " + format);
     console.error.apply(console, temp);
+    console.trace();
     var filelogger = getLogger(tag);
     filelogger.log.apply(filelogger, temp);
 }

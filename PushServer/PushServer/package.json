@@ -1,11 +1,13 @@
 {
-  "name": "PushServer",
-  "version": "0.0.0",
-  "description": "PushServer",
-  "main": "app.js",
-  "author": {
-    "name": "Administrator",
-    "email": ""
-  },
-  "dependencies": {}
+    "name": "PushServer",
+    "version": "0.0.0",
+    "description": "PushServer",
+    "main": "app.js",
+    "author": {
+        "name": "Administrator",
+        "email": ""
+    },
+    "dependencies": { 
+        "redis": "*"
+    }
 }

@@ -1,28 +1,46 @@
-﻿import task = require("../../tasking/Task");
+﻿import base = require("./base/RedisCmdTask");
 import log = require("../../../utils/Log");
+import util = require("util");
 
-export class SMembersTask extends task.Task {
+export class SMembersTask extends base.RedisCmdTask {
 
-    public queryKey: string;
-    public result: Array<string>;
+    private key: string;
+    private taskAsKey: base.RedisCmdTask;
 
-    constructor(client: any, key: string) {
+    constructor(client: any, key: any) {
         super(client);
-        this.queryKey = key;
+        if (key instanceof base.RedisCmdTask) {
+            this.taskAsKey = key;
+        }
+        else {
+            this.key = key;
+        }
+    }
+
+    GetKey(): string {
+        if (this.key == null) {
+            return this.taskAsKey.result;
+        } else {
+            return this.key;
+        }
     }
 
     Execute() {
         super.Execute();
+        
         var self = this;
-        this.data.smembers(this.queryKey, function (error, result) {
+        var key = this.GetKey();
+        if (key == null) {
+            this.Done();
+            return;
+        }
+
+        this.data.smembers(key, function (error, result) {
             if (error == null) {
-                self.result = result;
-                log.debug("SMembersTask", "redis smember: key=%s, result=%s", self.queryKey, result);
-                self.Done();
+                self.DoneWithResult(result, util.format("redis >smember finish: key=%s res=%s", key, result));
             }
             else {
-                log.error("SMembersTask", "redis smember error:%s", error);
-                self.Abort();
+                self.AbortWithError(util.format("redis >smember error: key=%s error=%s", key, error));
             }
         });
     }

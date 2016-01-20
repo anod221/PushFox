@@ -46,7 +46,7 @@ export class PushTask extends task.Task {
         tasks.once("complete", function () {
             var m: Array<string> = new Array<string>();
             for (var i = 0; i < messages.length; ++i) {
-                m.push(messages[i].result+"&index="+messages[i].queryKey);
+                m.push(messages[i].result+"&index="+messages[i].GetKey());
             }
             self.Push( m );
         });

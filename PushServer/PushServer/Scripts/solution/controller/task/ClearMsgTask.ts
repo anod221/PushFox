@@ -15,12 +15,12 @@ import tget = require("../../database/redistask/GetTask");
 export class ClearMsgTask extends task.Task {
 
     private msgids: Array<string>;
-    private dev: device.IDevice;
+    private udid: string;
 
     constructor( client: any, dev: device.IDevice, ids:Array<string>) {
         super( client );
         this.msgids = ids;
-        this.dev = dev;
+        this.udid = dev.GetDeviceUniqueID();
     }
 
     Execute() {
@@ -29,7 +29,7 @@ export class ClearMsgTask extends task.Task {
         var self = this;
         var client = this.data;
         var targets = this.msgids.slice();
-        targets.unshift(this.dev.GetDeviceUniqueID());
+        targets.unshift(this.udid);
         client.multi()
             .select(tsel.SelectDBTask.DB_PENDING_MAP)
             .srem(targets)

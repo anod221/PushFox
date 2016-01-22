@@ -10,6 +10,9 @@ import iterm = require("../../../network/ITerminal");
 // 发送到推送服务器，完成设备登入流程。
 //
 export interface IDevice {
+    // 是否可用
+    IsActive(): boolean;
+
     // 设备唯一编号
     GetDeviceUniqueID(): string;
 

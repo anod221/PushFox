@@ -30,7 +30,6 @@ export class PushTask extends task.Task {
             return;
         }
 
-
         var tasks = new taskq.TaskQueue();
         var self = this;
         var client = this.data;
@@ -48,7 +47,9 @@ export class PushTask extends task.Task {
             for (var i = 0; i < messages.length; ++i) {
                 m.push(messages[i].result+"&index="+messages[i].GetKey());
             }
-            self.Push( m );
+
+            if( self.dev.IsActive() )
+                self.Push( m );
         });
         tasks.once("abort", function () {
             self.Done();

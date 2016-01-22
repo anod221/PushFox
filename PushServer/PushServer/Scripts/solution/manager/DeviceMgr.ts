@@ -8,9 +8,13 @@ var deviceMap = {};             //key: udid  value: IDevice
 var TAG = "DeviceMgr";
 
 export function NewDevice(terminal: iterm.ITerminal, info: Object): idev.IDevice {
+
     // 1 创建device示例
     var device: idev.IDevice = new dev.Device( terminal, info );
     // 2 加入到访问列表
+    if (deviceMap[device.GetDeviceUniqueID()] != undefined) {
+        KillDevice( deviceMap[device.GetDeviceUniqueID()] )
+    }
     deviceMap[device.GetDeviceUniqueID()] = device;
     // 3 收听设备消息
     device.Start();

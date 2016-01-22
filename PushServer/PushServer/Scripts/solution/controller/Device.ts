@@ -46,6 +46,10 @@ export class Device implements idev.IDevice {
         return this.param[key];
     }
 
+    IsActive(): boolean {
+        return this.active;
+    }
+
     Start(): void {
         this.active = true;
         var self = this;
@@ -88,6 +92,7 @@ export class Device implements idev.IDevice {
             this.isBusy = true;
             var self = this;
             task.once("complete", function () {
+                log.debug("Device", "device push done: id=%s", self.udid);
                 self.isBusy = false;
                 if (self.isPending) {
                     self.isPending = false;

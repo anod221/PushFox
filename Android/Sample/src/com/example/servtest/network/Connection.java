@@ -109,6 +109,7 @@ public class Connection implements Runnable
 			{
 				// 重新建立连接
 			}
+			System.out.println("send req:"+req.id);
 		}
 	}
 	

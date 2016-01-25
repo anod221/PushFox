@@ -31,7 +31,6 @@ public class ProtoPush extends Protocol {
 		Vector<String> indexes = new Vector<String>();
 		for( int i=0; i < this.messages.size(); ++i ){
 			String msg = this.messages.get(i);
-			System.out.println(msg);
 			
 			// 分析querystring
 			int p = msg.indexOf("index=");

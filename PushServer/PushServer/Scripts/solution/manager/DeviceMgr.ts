@@ -24,7 +24,6 @@ export function NewDevice(terminal: iterm.ITerminal, info: Object): idev.IDevice
 }
 
 export function KillDevice(device: idev.IDevice): void {
-    device.GetEventEmitter().emit("exit", device);
     device.Destroy();
     log.info(TAG, "free device: udid=%s", device.GetDeviceUniqueID());
     delete deviceMap[ device.GetDeviceUniqueID() ];

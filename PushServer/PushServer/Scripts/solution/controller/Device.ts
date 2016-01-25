@@ -66,6 +66,7 @@ export class Device implements idev.IDevice {
             // 取消推送监听
             access.Instance().SetPushProcessor(this, null);
             // 清理事件监听
+            this.emitter.emit("exit", this);
             this.emitter.removeAllListeners();
             // 关闭频道订阅
             this.emitter = null;
